@@ -3,6 +3,8 @@ package com.silviotmalmeida.app.javafx;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import com.silviotmalmeida.app.JavaFXApplication;
@@ -24,6 +26,11 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("MainView.fxml")
 public class MainViewController implements Initializable {
 
+    // injetando o contexto do spring, para permitir as demais injeções nos
+    // controllers chamados
+    @Autowired
+    private ApplicationContext springContext;
+
     // a anotação @FXML faz a ligação com os elementos da view
     @FXML
     private MenuItem menuItemSeller;
@@ -44,6 +51,8 @@ public class MainViewController implements Initializable {
     @FXML
     public void onMenuItemDepartmentAction() {
 
+        // carrega a tela na cena principal
+        this.loadView2("DepartmentList.fxml");
     }
 
     // referente método disparado pelo evento onAction do menuItemAbout
@@ -71,6 +80,7 @@ public class MainViewController implements Initializable {
             // carregando a tela informada
             // as views devem ser baseadas em VBox
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            loader.setControllerFactory(springContext::getBean);
             VBox newVBox = loader.load();
 
             // obtendo a cena principal
@@ -93,6 +103,52 @@ public class MainViewController implements Initializable {
         }
         // em caso de exceção, exibe um alerta
         catch (Exception e) {
+            Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+        }
+
+    }
+
+    // método que vai substituir o conteúdo da cena principal por uma tela
+    // informada, preservando o menu.
+    // as telas devem ser baseadas em VBox
+    // o atributo synchronized torna a execução sícrona nneste método
+    private synchronized void loadView2(String absoluteName) {
+
+        // tratando as exceções
+        try {
+
+            // carregando a tela informada
+            // as views devem ser baseadas em VBox
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            loader.setControllerFactory(springContext::getBean);
+            VBox newVBox = loader.load();
+
+            // obtendo a cena principal
+            Scene mainScene = JavaFXApplication.getMainScene();
+
+            // obtendo o VBox da cena principal, a ser alterado
+            VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
+
+            // obtendo o menu a ser preservado
+            Node mainMenu = mainVBox.getChildren().get(0);
+
+            // limpando o VBox da cena principal
+            mainVBox.getChildren().clear();
+
+            // reinserindo o menu preservado
+            mainVBox.getChildren().add(mainMenu);
+
+            // inserindo o novo conteúdo
+            mainVBox.getChildren().addAll(newVBox.getChildren());
+
+            DepartmentListController controller = loader.getController();
+            controller.updateTableView();
+        }
+        // em caso de exceção, exibe um alerta
+        catch (Exception e) {
+
+            e.printStackTrace();
+
             Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
         }
 
