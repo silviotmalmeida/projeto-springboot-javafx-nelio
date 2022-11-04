@@ -6,29 +6,29 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.silviotmalmeida.app.entities.Department;
-import com.silviotmalmeida.app.repositories.DepartmentRepository;
+import com.silviotmalmeida.app.entities.Seller;
+import com.silviotmalmeida.app.repositories.SellerRepository;
 
-// classe de serviço que realiza a comunicação entre o DepartmentListController e o DepartmentRepository
+// classe de serviço que realiza a comunicação entre o SellerListController e o SellerRepository
 // registrando a classe como service
 @Service
-public class DepartmentService {
+public class SellerService {
 
-    // injetando o repository da entidade Department
+    // injetando o repository da entidade Seller
     @Autowired
-    private DepartmentRepository repository;
+    private SellerRepository repository;
 
     // método que retorna todos os registros
-    public List<Department> findAll() {
+    public List<Seller> findAll() {
 
         return this.repository.findAll();
     }
 
     // método que retorna o registro do id selecionado
-    public Department findById(Long id) {
+    public Seller findById(Long id) {
 
         // obtendo o registro
-        Optional<Department> obj = this.repository.findById(id);
+        Optional<Seller> obj = this.repository.findById(id);
 
         // retorna o registro, se existir
         return obj.get();

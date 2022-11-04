@@ -1,20 +1,25 @@
 package com.silviotmalmeida.app.javafx;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
 
 import com.silviotmalmeida.app.JavaFXApplication;
 import com.silviotmalmeida.app.entities.Department;
+import com.silviotmalmeida.app.javafx.utils.Alerts;
+import com.silviotmalmeida.app.javafx.utils.Utils;
 import com.silviotmalmeida.app.services.DepartmentService;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 
 // import java.io.IOException;
 // import java.net.URL;
@@ -34,10 +39,14 @@ import javafx.fxml.FXML;
 // import javafx.fxml.FXML;
 // import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 // import javafx.scene.Scene;
 // import javafx.scene.control.Alert.AlertType;
@@ -55,9 +64,14 @@ import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 
 // controlador da tela DepartmentList.fxml
-@Service
+@Controller
 @FxmlView("DepartmentList.fxml")
 public class DepartmentListController implements Initializable {
+
+    // injetando o contexto do spring, para permitir as demais injeções nos
+    // controllers chamados a partir deste
+    @Autowired
+    private ApplicationContext springContext;
 
     // injetando o service da entidade Department
     @Autowired
@@ -88,11 +102,9 @@ public class DepartmentListController implements Initializable {
     // referente método disparado pelo evento onAction do btNew
     @FXML
     public synchronized void onBtNewAction(ActionEvent event) {
-        // Stage parentStage = Utils.currentStage(event);
-        // Department obj = new Department();
-        // createDialogForm(obj, "/gui/DepartmentForm.fxml", parentStage);
-
-        System.out.println("onBtNewAction");
+        Stage parentStage = Utils.currentStage(event);
+        Department obj = new Department();
+        createDialogForm(obj, "DepartmentForm.fxml", parentStage);
     }
 
     // sobrecarregando o método de configuração da tela para inicialização
@@ -103,7 +115,7 @@ public class DepartmentListController implements Initializable {
         initializeNodes();
     }
 
-    // método auxiliar responsável por iniciar os dados da tabela
+    // método auxiliar responsável por configurar a tabela
     private void initializeNodes() {
 
         // definindo a ligação das colunas da tabela com os atributos da entidade
@@ -121,8 +133,6 @@ public class DepartmentListController implements Initializable {
     // tabela
     public void updateTableView() {
 
-        System.out.println("entrei");
-
         // se o service não estiver injetado, lança uma exceção
         if (service == null) {
             throw new IllegalStateException("Service was null");
@@ -131,8 +141,6 @@ public class DepartmentListController implements Initializable {
         // obtendo os dados do BD
         List<Department> list = this.service.findAll();
 
-        System.out.println(list);
-
         // renderizando os dados na tabela
         this.obsList = FXCollections.observableArrayList(list);
         tableViewDepartment.setItems(this.obsList);
@@ -140,31 +148,29 @@ public class DepartmentListController implements Initializable {
         // initRemoveButtons();
     }
 
-    // private void createDialogForm(Department obj, String absoluteName, Stage
-    // parentStage) {
-    // try {
-    // FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-    // Pane pane = loader.load();
+    private void createDialogForm(Department obj, String absoluteName, Stage parentStage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            loader.setControllerFactory(springContext::getBean);
+            Pane pane = loader.load();
 
-    // DepartmentFormController controller = loader.getController();
-    // controller.setDepartment(obj);
-    // controller.setDepartmentService(new DepartmentService());
-    // controller.subscribeDataChangeListener(this);
-    // controller.updateFormData();
+            // DepartmentFormController controller = loader.getController();
+            // controller.setDepartment(obj);
+            // controller.updateFormData();
 
-    // Stage dialogStage = new Stage();
-    // dialogStage.setTitle("Enter Department data");
-    // dialogStage.setScene(new Scene(pane));
-    // dialogStage.setResizable(false);
-    // dialogStage.initOwner(parentStage);
-    // dialogStage.initModality(Modality.WINDOW_MODAL);
-    // dialogStage.showAndWait();
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(),
-    // AlertType.ERROR);
-    // }
-    // }
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Enter Department data");
+            dialogStage.setScene(new Scene(pane));
+            dialogStage.setResizable(false);
+            dialogStage.initOwner(parentStage);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(),
+                    AlertType.ERROR);
+        }
+    }
 
     // @Override
     // public void onDataChanged() {

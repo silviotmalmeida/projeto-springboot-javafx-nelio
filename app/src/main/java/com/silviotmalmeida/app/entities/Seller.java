@@ -1,25 +1,23 @@
 package com.silviotmalmeida.app.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-// classe que representa uma entidade Category
+// classe que representa uma entidade Seller
 // é serializable para permitir operações de IO
 // foi incluída a anotação de identificação como entidade para o JPA
-// foi incluída a anotação para mapeamento da tabela tb_category
+// foi incluída a anotação para mapeamento da tabela tb_seller
 @Entity
-@Table(name = "tb_department")
-public class Department implements Serializable {
+@Table(name = "tb_seller")
+public class Seller implements Serializable {
 
     // atributo serial (obrigatório em serializables)
     private static final long serialVersionUID = 1L;
@@ -30,24 +28,28 @@ public class Department implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String email;
+    private Instant birthDate;
+    private Double baseSalary;
 
-    // associação 1xn com a entidade Seller
-    // definindo o nome do atributo do objeto Seller a ser considerado na associação
-    // a anotação JsonIgnore serve informar que esta entidade não irá apresentar os
-    // dados desta associação para evitar loop infinito na resposta e deve ser
-    // colocado em um dos lados das associações
-    @JsonIgnore
-    @OneToMany(mappedBy = "department")
-    private List<Seller> sellers = new ArrayList<>();
+    // associação nx1 com a entidade Department
+    // definindo o nome da coluna com a chave estrangeira para department_id
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     // construtor vazio (necessário para o framework)
-    public Department() {
+    public Seller() {
     }
 
     // construtor
-    public Department(Long id, String name) {
+    public Seller(Long id, String name, String email, Instant birthDate, Double baseSalary, Department department) {
         this.id = id;
         this.name = name;
+        this.email = email;
+        this.birthDate = birthDate;
+        this.baseSalary = baseSalary;
+        this.department = department;
     }
 
     // início dos getters e setters
@@ -68,8 +70,28 @@ public class Department implements Serializable {
         this.name = name;
     }
 
-    public List<Seller> getSellers() {
-        return sellers;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Instant getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Instant birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Double getBaseSalary() {
+        return baseSalary;
+    }
+
+    public void setBaseSalary(Double baseSalary) {
+        this.baseSalary = baseSalary;
     }
     // fim dos getters e setters
     // ------------------------------------------------------------------
@@ -92,7 +114,7 @@ public class Department implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Department other = (Department) obj;
+        Seller other = (Seller) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -105,6 +127,7 @@ public class Department implements Serializable {
     // ------------------------------------------------------------------
     @Override
     public String toString() {
-        return "Department [id=" + id + ", name=" + name + "]";
+        return "Seller [id=" + id + ", name=" + name + ", email=" + email + ", birthDate=" + birthDate + ", baseSalary="
+                + baseSalary + ", department=" + department + "]";
     }
 }
