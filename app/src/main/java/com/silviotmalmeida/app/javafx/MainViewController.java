@@ -1,5 +1,6 @@
 package com.silviotmalmeida.app.javafx;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -46,13 +47,19 @@ public class MainViewController implements Initializable {
     @FXML
     public void onMenuItemSellerAction() {
 
+        // carrega a tela de listagem de vendedores na cena principal
+        // atribuindo o controller e ações iniciais
+        this.loadView("SellerList.fxml", (SellerListController controller) -> {
+            controller.updateTableView();
+        });
+
     }
 
     // referente método disparado pelo evento onAction do menuItemDepartment
     @FXML
     public void onMenuItemDepartmentAction() {
 
-        // carrega a tela na cena principal
+        // carrega a tela de listagem de departamentos na cena principal
         // atribuindo o controller e ações iniciais
         this.loadView("DepartmentList.fxml", (DepartmentListController controller) -> {
             controller.updateTableView();
@@ -77,7 +84,7 @@ public class MainViewController implements Initializable {
     // método que vai substituir o conteúdo da cena principal por uma tela
     // informada, preservando o menu.
     // as telas devem ser baseadas em VBox
-    // caso a tela possua controller, deve-se realizar a atribuição do mesmo e 
+    // caso a tela possua controller, deve-se realizar a atribuição do mesmo e
     // definição das ações de inicialização com expressões lambda
     // o atributo synchronized torna a execução sícrona nneste método
     private synchronized <T> void loadView(String absoluteName, Consumer<T> initializingAction) {
@@ -116,7 +123,7 @@ public class MainViewController implements Initializable {
             initializingAction.accept(controller);
         }
         // em caso de exceção, exibe um alerta
-        catch (Exception e) {
+        catch (IOException e) {
             Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
         }
     }

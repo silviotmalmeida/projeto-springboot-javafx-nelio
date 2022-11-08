@@ -1,7 +1,9 @@
 package com.silviotmalmeida.app.javafx.utils;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
@@ -22,6 +24,8 @@ public class Utils {
         return (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 
+    // método que converte uma string para inteiro, retornando null em caso de
+    // exceção
     public static Integer tryParseToInt(String str) {
         try {
             return Integer.parseInt(str);
@@ -30,6 +34,18 @@ public class Utils {
         }
     }
 
+    // método que converte uma string para long, retornando null em caso de
+    // exceção
+    public static Long tryParseToLong(String str) {
+        try {
+            return Long.parseLong(str);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    // método que converte uma string para double, retornando null em caso de
+    // exceção
     public static Double tryParseToDouble(String str) {
         try {
             return Double.parseDouble(str);
@@ -50,6 +66,26 @@ public class Utils {
                         setText(null);
                     } else {
                         setText(sdf.format(item));
+                    }
+                }
+            };
+            return cell;
+        });
+    }
+
+    public static <T> void formatTableColumnInstant(TableColumn<T, Instant> tableColumn, String format) {
+        tableColumn.setCellFactory(column -> {
+            TableCell<T, Instant> cell = new TableCell<T, Instant>() {
+
+                private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format).withZone(ZoneId.systemDefault());;
+
+                @Override
+                protected void updateItem(Instant item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                    } else {
+                        setText(formatter.format(item));
                     }
                 }
             };

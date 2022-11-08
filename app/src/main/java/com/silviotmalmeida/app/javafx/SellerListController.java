@@ -2,6 +2,7 @@ package com.silviotmalmeida.app.javafx;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -11,11 +12,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import com.silviotmalmeida.app.JavaFXApplication;
-import com.silviotmalmeida.app.entities.Department;
+import com.silviotmalmeida.app.entities.Seller;
 import com.silviotmalmeida.app.javafx.listeners.DataChangeListener;
 import com.silviotmalmeida.app.javafx.utils.Alerts;
 import com.silviotmalmeida.app.javafx.utils.Utils;
-import com.silviotmalmeida.app.services.DepartmentService;
+import com.silviotmalmeida.app.services.SellerService;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -37,42 +38,51 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
 
-// controlador da tela DepartmentList.fxml
-// tem o papel de listener para a interface DataChangeListener, ou seja, é a classe que observa o evento emitido pelo DepartmentFormController
+// controlador da tela SellerList.fxml
+// tem o papel de listener para a interface DataChangeListener, ou seja, é a classe que observa o evento emitido pelo SellerFormController
 @Controller
-@FxmlView("DepartmentList.fxml")
-public class DepartmentListController implements Initializable, DataChangeListener {
+@FxmlView("SellerList.fxml")
+public class SellerListController implements Initializable, DataChangeListener {
 
     // injetando o contexto do spring, para permitir as demais injeções nos
     // controllers chamados a partir deste
     @Autowired
     private ApplicationContext springContext;
 
-    // injetando o service da entidade Department
+    // injetando o service da entidade Seller
     @Autowired
-    private DepartmentService service;
+    private SellerService service;
 
     // a anotação @FXML faz a ligação com os elementos da view
     @FXML
-    private TableView<Department> tableViewDepartment;
+    private TableView<Seller> tableViewSeller;
 
     @FXML
-    private TableColumn<Department, Integer> tableColumnId;
+    private TableColumn<Seller, Integer> tableColumnId;
 
     @FXML
-    private TableColumn<Department, String> tableColumnName;
+    private TableColumn<Seller, String> tableColumnName;
 
     @FXML
-    private TableColumn<Department, Department> tableColumnEDIT;
+    private TableColumn<Seller, String> tableColumnEmail;
 
     @FXML
-    private TableColumn<Department, Department> tableColumnREMOVE;
+    private TableColumn<Seller, Instant> tableColumnBirthDate;
+
+    @FXML
+    private TableColumn<Seller, Double> tableColumnBaseSalary;
+
+    @FXML
+    private TableColumn<Seller, Seller> tableColumnEDIT;
+
+    @FXML
+    private TableColumn<Seller, Seller> tableColumnREMOVE;
 
     @FXML
     private Button btNew;
 
     // atributo para armazenar a lista de departamentos a ser renderizada na tabela
-    private ObservableList<Department> obsList;
+    private ObservableList<Seller> obsList;
 
     // referente método disparado pelo evento onAction do btNew
     @FXML
@@ -81,11 +91,11 @@ public class DepartmentListController implements Initializable, DataChangeListen
         // obtendo o stage pai
         Stage parentStage = Utils.currentStage(event);
 
-        // declarando um Department vazio, pois trata-se de create
-        Department obj = new Department();
+        // declarando um Seller vazio, pois trata-se de create
+        Seller obj = new Seller();
 
         // criando o formulário de create
-        createDialogForm(obj, "DepartmentForm.fxml", parentStage);
+        // createDialogForm(obj, "SellerForm.fxml", parentStage);
     }
 
     // sobrecarregando o método de configuração da tela para inicialização
@@ -102,12 +112,18 @@ public class DepartmentListController implements Initializable, DataChangeListen
         // definindo a ligação das colunas da tabela com os atributos da entidade
         tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+
+        Utils.formatTableColumnInstant(tableColumnBirthDate, "dd/MM/yyyy");
+        Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
 
         // obtendo o stage a partir da cena
         Stage stage = (Stage) JavaFXApplication.getMainScene().getWindow();
 
         // ajustando a altura da tabela para acompanhar a janela
-        tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
+        tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
     }
 
     // método responsável por popular a lista de departamentos a ser renderizada na
@@ -120,57 +136,58 @@ public class DepartmentListController implements Initializable, DataChangeListen
         }
 
         // obtendo os dados do BD
-        List<Department> list = this.service.findAll();
+        List<Seller> list = this.service.findAll();
 
         // renderizando os dados na tabela
         this.obsList = FXCollections.observableArrayList(list);
-        tableViewDepartment.setItems(this.obsList);
+        tableViewSeller.setItems(this.obsList);
         initEditButtons();
         initRemoveButtons();
     }
 
     // método que vai criar uma tela diálogo com formulário
     // o atributo synchronized torna a execução sícrona nneste método
-    private synchronized void createDialogForm(Department obj, String absoluteName, Stage parentStage) {
+    // private synchronized void createDialogForm(Seller obj, String absoluteName,
+    // Stage parentStage) {
 
-        // tratando as exceções
-        try {
+    // // tratando as exceções
+    // try {
 
-            // carregando a tela informada e incluindo o contexto do spring
-            // será criado um
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-            loader.setControllerFactory(springContext::getBean);
-            Pane pane = loader.load();
+    // // carregando a tela informada e incluindo o contexto do spring
+    // // será criado um
+    // FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+    // loader.setControllerFactory(springContext::getBean);
+    // Pane pane = loader.load();
 
-            // obtendo o controller da tela
-            DepartmentFormController controller = loader.getController();
+    // // obtendo o controller da tela
+    // SellerFormController controller = loader.getController();
 
-            // injetando o entidade Department e atualizando os dados do formulário, caso
-            // existam
-            controller.setDepartment(obj);
-            controller.updateFormData();
+    // // injetando o entidade Seller e atualizando os dados do formulário, caso
+    // // existam
+    // controller.setSeller(obj);
+    // controller.updateFormData();
 
-            // increvendo este objeto como listener do controller para viabilizar
-            // atualização dos dados da tabela
-            controller.subscribeDataChangeListener(this);
+    // // increvendo este objeto como listener do controller para viabilizar
+    // // atualização dos dados da tabela
+    // controller.subscribeDataChangeListener(this);
 
-            // criando uma nova janela e configurando como modal
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Enter Department data");
-            dialogStage.setScene(new Scene(pane));
-            dialogStage.setResizable(false);
-            dialogStage.initOwner(parentStage);
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.showAndWait();
+    // // criando uma nova janela e configurando como modal
+    // Stage dialogStage = new Stage();
+    // dialogStage.setTitle("Enter Seller data");
+    // dialogStage.setScene(new Scene(pane));
+    // dialogStage.setResizable(false);
+    // dialogStage.initOwner(parentStage);
+    // dialogStage.initModality(Modality.WINDOW_MODAL);
+    // dialogStage.showAndWait();
 
-        }
-        // em caso de exceção, exibe um alerta
-        catch (IOException e) {
-            e.printStackTrace();
-            Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(),
-                    AlertType.ERROR);
-        }
-    }
+    // }
+    // // em caso de exceção, exibe um alerta
+    // catch (IOException e) {
+    // e.printStackTrace();
+    // Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(),
+    // AlertType.ERROR);
+    // }
+    // }
 
     // sobrescrevendo o método a ser disparado pelo subject do DataChangeListener
     @Override
@@ -184,23 +201,23 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
         // para cada linha será gerado um botão
         tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
+        tableColumnEDIT.setCellFactory(param -> new TableCell<Seller, Seller>() {
 
             // definindo o label do botão
             private final Button button = new Button("edit");
 
             // definindo o evento do botão
             @Override
-            protected void updateItem(Department obj, boolean empty) {
+            protected void updateItem(Seller obj, boolean empty) {
                 super.updateItem(obj, empty);
                 if (obj == null) {
                     setGraphic(null);
                     return;
                 }
                 setGraphic(button);
-                button.setOnAction(
-                        event -> createDialogForm(obj, "DepartmentForm.fxml",
-                                Utils.currentStage(event)));
+                // button.setOnAction(
+                // event -> createDialogForm(obj, "SellerForm.fxml",
+                // Utils.currentStage(event)));
             }
         });
     }
@@ -211,14 +228,14 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
         // para cada linha será gerado um botão
         tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        tableColumnREMOVE.setCellFactory(param -> new TableCell<Department, Department>() {
+        tableColumnREMOVE.setCellFactory(param -> new TableCell<Seller, Seller>() {
 
             // definindo o label do botão
             private final Button button = new Button("remove");
 
             // definindo o evento do botão
             @Override
-            protected void updateItem(Department obj, boolean empty) {
+            protected void updateItem(Seller obj, boolean empty) {
                 super.updateItem(obj, empty);
                 if (obj == null) {
                     setGraphic(null);
@@ -232,7 +249,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
     // método auxiliar para lançar o alert de confirmação de exclusão,
     // bem como responsável por remover o registro
-    private void removeEntity(Department obj) {
+    private void removeEntity(Seller obj) {
 
         // exibindo o alert de confirmação
         Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?");

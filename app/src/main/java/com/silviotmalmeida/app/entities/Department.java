@@ -13,10 +13,10 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-// classe que representa uma entidade Category
+// classe que representa uma entidade Department
 // é serializable para permitir operações de IO
 // foi incluída a anotação de identificação como entidade para o JPA
-// foi incluída a anotação para mapeamento da tabela tb_category
+// foi incluída a anotação para mapeamento da tabela tb_department
 @Entity
 @Table(name = "tb_department")
 public class Department implements Serializable {
