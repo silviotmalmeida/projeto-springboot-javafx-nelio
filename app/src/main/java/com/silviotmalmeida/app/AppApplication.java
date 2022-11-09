@@ -1,5 +1,7 @@
 package com.silviotmalmeida.app;
 
+import java.util.Locale;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javafx.application.Application;
@@ -10,6 +12,11 @@ import javafx.application.Application;
 public class AppApplication {
 
 	public static void main(String[] args) {
+
+		// definindo o local
+		Locale.setDefault(Locale.US);
+
+		// iniciando a aplicação
 		Application.launch(JavaFXApplication.class, args);
 	}
 

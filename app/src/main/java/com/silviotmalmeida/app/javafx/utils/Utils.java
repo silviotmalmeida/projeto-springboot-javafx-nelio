@@ -1,11 +1,9 @@
 package com.silviotmalmeida.app.javafx.utils;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Locale;
 
 import javafx.event.ActionEvent;
@@ -54,30 +52,13 @@ public class Utils {
         }
     }
 
-    public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
-        tableColumn.setCellFactory(column -> {
-            TableCell<T, Date> cell = new TableCell<T, Date>() {
-                private SimpleDateFormat sdf = new SimpleDateFormat(format);
-
-                @Override
-                protected void updateItem(Date item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty) {
-                        setText(null);
-                    } else {
-                        setText(sdf.format(item));
-                    }
-                }
-            };
-            return cell;
-        });
-    }
-
+    // método que formata a exibição da data na tabela de dados
     public static <T> void formatTableColumnInstant(TableColumn<T, Instant> tableColumn, String format) {
         tableColumn.setCellFactory(column -> {
             TableCell<T, Instant> cell = new TableCell<T, Instant>() {
 
-                private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format).withZone(ZoneId.systemDefault());;
+                private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format)
+                        .withZone(ZoneId.systemDefault());;
 
                 @Override
                 protected void updateItem(Instant item, boolean empty) {
@@ -93,6 +74,7 @@ public class Utils {
         });
     }
 
+    // método que formata a exibição do salário na tabela de dados
     public static <T> void formatTableColumnDouble(TableColumn<T, Double> tableColumn, int decimalPlaces) {
         tableColumn.setCellFactory(column -> {
             TableCell<T, Double> cell = new TableCell<T, Double>() {
@@ -111,6 +93,7 @@ public class Utils {
         });
     }
 
+    // método que formata a exibição do datePicker no formulário
     public static void formatDatePicker(DatePicker datePicker, String format) {
         datePicker.setConverter(new StringConverter<LocalDate>() {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(format);

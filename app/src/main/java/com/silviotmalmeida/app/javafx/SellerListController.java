@@ -95,7 +95,7 @@ public class SellerListController implements Initializable, DataChangeListener {
         Seller obj = new Seller();
 
         // criando o formulário de create
-        // createDialogForm(obj, "SellerForm.fxml", parentStage);
+        createDialogForm(obj, "SellerForm.fxml", parentStage);
     }
 
     // sobrecarregando o método de configuração da tela para inicialização
@@ -116,7 +116,10 @@ public class SellerListController implements Initializable, DataChangeListener {
         tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
         tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
 
+        // formatando a exibição da data
         Utils.formatTableColumnInstant(tableColumnBirthDate, "dd/MM/yyyy");
+
+        // formatando a exibição do salário
         Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
 
         // obtendo o stage a partir da cena
@@ -147,47 +150,47 @@ public class SellerListController implements Initializable, DataChangeListener {
 
     // método que vai criar uma tela diálogo com formulário
     // o atributo synchronized torna a execução sícrona nneste método
-    // private synchronized void createDialogForm(Seller obj, String absoluteName,
-    // Stage parentStage) {
+    private synchronized void createDialogForm(Seller obj, String absoluteName,
+            Stage parentStage) {
 
-    // // tratando as exceções
-    // try {
+        // tratando as exceções
+        try {
 
-    // // carregando a tela informada e incluindo o contexto do spring
-    // // será criado um
-    // FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-    // loader.setControllerFactory(springContext::getBean);
-    // Pane pane = loader.load();
+            // carregando a tela informada e incluindo o contexto do spring
+            // será criado um
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+            loader.setControllerFactory(springContext::getBean);
+            Pane pane = loader.load();
 
-    // // obtendo o controller da tela
-    // SellerFormController controller = loader.getController();
+            // obtendo o controller da tela
+            SellerFormController controller = loader.getController();
 
-    // // injetando o entidade Seller e atualizando os dados do formulário, caso
-    // // existam
-    // controller.setSeller(obj);
-    // controller.updateFormData();
+            // injetando o entidade Seller e atualizando os dados do formulário, caso
+            // existam
+            controller.setSeller(obj);
+            controller.updateFormData();
 
-    // // increvendo este objeto como listener do controller para viabilizar
-    // // atualização dos dados da tabela
-    // controller.subscribeDataChangeListener(this);
+            // increvendo este objeto como listener do controller para viabilizar
+            // atualização dos dados da tabela
+            controller.subscribeDataChangeListener(this);
 
-    // // criando uma nova janela e configurando como modal
-    // Stage dialogStage = new Stage();
-    // dialogStage.setTitle("Enter Seller data");
-    // dialogStage.setScene(new Scene(pane));
-    // dialogStage.setResizable(false);
-    // dialogStage.initOwner(parentStage);
-    // dialogStage.initModality(Modality.WINDOW_MODAL);
-    // dialogStage.showAndWait();
+            // criando uma nova janela e configurando como modal
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Enter Seller data");
+            dialogStage.setScene(new Scene(pane));
+            dialogStage.setResizable(false);
+            dialogStage.initOwner(parentStage);
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.showAndWait();
 
-    // }
-    // // em caso de exceção, exibe um alerta
-    // catch (IOException e) {
-    // e.printStackTrace();
-    // Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(),
-    // AlertType.ERROR);
-    // }
-    // }
+        }
+        // em caso de exceção, exibe um alerta
+        catch (IOException e) {
+            e.printStackTrace();
+            Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(),
+                    AlertType.ERROR);
+        }
+    }
 
     // sobrescrevendo o método a ser disparado pelo subject do DataChangeListener
     @Override
@@ -215,9 +218,9 @@ public class SellerListController implements Initializable, DataChangeListener {
                     return;
                 }
                 setGraphic(button);
-                // button.setOnAction(
-                // event -> createDialogForm(obj, "SellerForm.fxml",
-                // Utils.currentStage(event)));
+                button.setOnAction(
+                        event -> createDialogForm(obj, "SellerForm.fxml",
+                                Utils.currentStage(event)));
             }
         });
     }
