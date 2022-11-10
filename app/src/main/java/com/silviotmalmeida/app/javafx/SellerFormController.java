@@ -1,6 +1,7 @@
 package com.silviotmalmeida.app.javafx;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -197,7 +198,7 @@ public class SellerFormController implements Initializable {
         // inicializando um objeto de validação vazio
         ValidationException exception = new ValidationException("Validation error");
 
-        // populando o objeto
+        // populando o objeto, validando os dados
 
         //// id
         obj.setId(Utils.tryParseToLong(txtId.getText()));
@@ -210,6 +211,36 @@ public class SellerFormController implements Initializable {
 
             exception.addError("name", "Field can't be empty!");
         }
+
+        //// email
+        obj.setEmail(txtEmail.getText());
+        ////// validação de nulidade ou vazio
+        if (txtEmail.getText() == null
+                || txtEmail.getText().trim().equals("")) {
+
+            exception.addError("email", "Field can't be empty!");
+        }
+
+        //// birthDate
+        if (dpBirthDate.getValue() == null) {
+
+            exception.addError("birthDate", "Field can't be empty!");
+        } else {
+            Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+            obj.setBirthDate(instant);
+        }
+
+        //// baseSalary
+        obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+        ////// validação de nulidade ou vazio
+        if (txtBaseSalary.getText() == null
+                || txtBaseSalary.getText().trim().equals("")) {
+
+            exception.addError("baseSalary", "Field can't be empty!");
+        }
+
+        // department
+        obj.setDepartment(comboBoxDepartment.getValue());
 
         // se existir ao menos um erro, lança a exceção
         if (exception.getErrors().size() > 0) {
@@ -290,9 +321,10 @@ public class SellerFormController implements Initializable {
         // obtendo o conjunto de chaves com erro
         Set<String> fields = errors.keySet();
 
-        // se existir erro na chave name, preenche a label de erro
-        if (fields.contains("name")) {
-            labelErrorName.setText(errors.get("name"));
-        }
-    }    
+        // populando as labels de erro
+        labelErrorName.setText(fields.contains("name") ? errors.get("name") : "");
+        labelErrorEmail.setText(fields.contains("email") ? errors.get("email") : "");
+        labelErrorBirthDate.setText(fields.contains("birthDate") ? errors.get("birthDate") : "");
+        labelErrorBaseSalary.setText(fields.contains("baseSalary") ? errors.get("baseSalary") : "");
+    }
 }

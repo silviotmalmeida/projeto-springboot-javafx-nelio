@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import com.silviotmalmeida.app.JavaFXApplication;
+import com.silviotmalmeida.app.entities.Department;
 import com.silviotmalmeida.app.entities.Seller;
 import com.silviotmalmeida.app.javafx.listeners.DataChangeListener;
 import com.silviotmalmeida.app.javafx.utils.Alerts;
@@ -73,6 +74,9 @@ public class SellerListController implements Initializable, DataChangeListener {
     private TableColumn<Seller, Double> tableColumnBaseSalary;
 
     @FXML
+    private TableColumn<Seller, Department> tableColumnDepartment;
+
+    @FXML
     private TableColumn<Seller, Seller> tableColumnEDIT;
 
     @FXML
@@ -115,12 +119,16 @@ public class SellerListController implements Initializable, DataChangeListener {
         tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
         tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+        tableColumnDepartment.setCellValueFactory(new PropertyValueFactory<>("department"));
 
         // formatando a exibição da data
         Utils.formatTableColumnInstant(tableColumnBirthDate, "dd/MM/yyyy");
 
         // formatando a exibição do salário
         Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
+
+        // formatando a exibição do departamento
+        Utils.formatTableColumnDepartment(tableColumnDepartment);
 
         // obtendo o stage a partir da cena
         Stage stage = (Stage) JavaFXApplication.getMainScene().getWindow();

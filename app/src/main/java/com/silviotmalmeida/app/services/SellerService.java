@@ -69,6 +69,10 @@ public class SellerService {
 
         // editando os atributos permitidos
         entity.setName(obj.getName());
+        entity.setEmail(obj.getEmail());
+        entity.setBirthDate(obj.getBirthDate());
+        entity.setBaseSalary(obj.getBaseSalary());
+        entity.setDepartment(obj.getDepartment());
     }
 
     // método que insere ou edita um registro

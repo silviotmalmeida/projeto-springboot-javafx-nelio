@@ -6,6 +6,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import com.silviotmalmeida.app.entities.Department;
+
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
@@ -86,6 +88,24 @@ public class Utils {
                     } else {
                         Locale.setDefault(Locale.US);
                         setText(String.format("%." + decimalPlaces + "f", item));
+                    }
+                }
+            };
+            return cell;
+        });
+    }
+
+    // método que formata a exibição do departamento na tabela de dados
+    public static <T> void formatTableColumnDepartment(TableColumn<T, Department> tableColumn) {
+        tableColumn.setCellFactory(column -> {
+            TableCell<T, Department> cell = new TableCell<T, Department>() {
+                @Override
+                protected void updateItem(Department item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                    } else {
+                        setText(item.getName());
                     }
                 }
             };
